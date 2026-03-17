@@ -21,7 +21,15 @@
           system,
           ...
         }:
+        let
+          idp-lecture-finder = import ./default.nix { inherit pkgs; };
+        in
         {
+          packages = {
+            inherit idp-lecture-finder;
+            default = idp-lecture-finder;
+          };
+
           devenv.shells.default = {
             packages = with pkgs; [
               lldb
