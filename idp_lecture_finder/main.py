@@ -271,16 +271,52 @@ def stage_run(args):
 
     for stage in stages[start_index:]:
         print(f"\n=== Running {stage} stage ===")
+
         if stage == "scrape":
-            stage_scrape(args)
+            stage_scrape(
+                argparse.Namespace(
+                    term=args.term, curricula=args.curricula, output=LECTURES_FILE
+                )
+            )
+
         elif stage == "score":
-            stage_score(args)
+            stage_score(
+                argparse.Namespace(
+                    input=LECTURES_FILE,
+                    output=SCORED_FILE,
+                    topic=args.topic,
+                    model=args.model,
+                )
+            )
+
         elif stage == "filter":
-            stage_filter(args)
+            stage_filter(
+                argparse.Namespace(
+                    input=SCORED_FILE,
+                    output=FILTERED_FILE,
+                    cutoff=args.cutoff,
+                    top_k=None,
+                )
+            )
+
         elif stage == "enrich":
-            stage_enrich(args)
+            stage_enrich(
+                argparse.Namespace(
+                    input=FILTERED_FILE,
+                    output=ENRICHED_FILE,
+                    base_url="https://campus.tum.de/tumonline/ee/rest/",
+                )
+            )
+
         elif stage == "recommend":
-            stage_recommend(args)
+            stage_recommend(
+                argparse.Namespace(
+                    lectures=ENRICHED_FILE,
+                    idp=IDP_FILE,
+                    topic=args.topic,
+                    model=args.model,
+                )
+            )
 
 
 # -----------------------
@@ -333,21 +369,30 @@ def main():
     p.set_defaults(func=stage_recommend)
 
     # ---- run pipeline ----
-    p = sub.add_parser("run")
+    p = sub.add_parser("run", help="Run the full pipeline from a given stage")
     p.add_argument(
         "--from-stage",
         choices=["scrape", "score", "filter", "enrich", "recommend"],
         default="scrape",
+        help="Stage to start the pipeline from",
     )
-    p.add_argument("--term", type=int, default=206)
-    p.add_argument("--curricula", nargs="+", type=int, default=[5217])
-    p.add_argument("--topic", required=True)
-    p.add_argument("--cutoff", type=float, default=2.0)
-    p.add_argument("--model", default="openai:gpt-5.2")
-    p.add_argument("--input", default=LECTURES_FILE)
-    p.add_argument("--output", default=FILTERED_FILE)
-    p.add_argument("--lectures", default=FILTERED_FILE)
-    p.add_argument("--idp", default=IDP_FILE)
+    p.add_argument(
+        "--term", type=int, default=206, help="Term ID for scraping lectures"
+    )
+    p.add_argument(
+        "--curricula",
+        nargs="+",
+        type=int,
+        default=[5217],
+        help="Curriculum IDs for scraping",
+    )
+    p.add_argument(
+        "--topic", required=True, help="IDP topic for scoring/recommendation"
+    )
+    p.add_argument(
+        "--cutoff", type=float, default=2.0, help="Score cutoff for filtering"
+    )
+    p.add_argument("--model", default="openai:gpt-5.2", help="LLM model to use")
     p.set_defaults(func=stage_run)
 
     args = parser.parse_args()
