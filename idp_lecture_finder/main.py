@@ -335,7 +335,9 @@ def main():
     # ---- run pipeline ----
     p = sub.add_parser("run")
     p.add_argument(
-        "--from-stage", choices=["scrape", "filter", "recommend"], default="scrape"
+        "--from-stage",
+        choices=["scrape", "score", "filter", "enrich", "recommend"],
+        default="scrape",
     )
     p.add_argument("--term", type=int, default=206)
     p.add_argument("--curricula", nargs="+", type=int, default=[5217])
