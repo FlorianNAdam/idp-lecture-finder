@@ -9,7 +9,7 @@ from idp_lecture_finder.llm import filter_lectures
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
-from langchain.callbacks.base import BaseCallbackHandler
+from langchain_core.callbacks import BaseCallbackHandler
 
 from rich.console import Console
 from rich.markdown import Markdown
