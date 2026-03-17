@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.devenv
+.direnv
+
+# Private !!!
+.envrc.private
+http_cache.sqlite
+
+# Misc
+data
